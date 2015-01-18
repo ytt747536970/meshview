@@ -1,0 +1,49 @@
+﻿生成启动时间为 2015/1/18 16:49:27。
+     1>项目“F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\MeshView.vcxproj”在节点 2 上(build 个目标)。
+     1>InitializeBuildStatus:
+         正在对“Release\MeshView.unsuccessfulbuild”执行 Touch 任务。
+       CustomBuild:
+         所有输出均为最新。
+       ClCompile:
+         所有输出均为最新。
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\MeshView.exe" /INCREMENTAL:NO /NOLOGO d3d11.lib d3dx11.lib D3DCompiler.lib Effects11.lib dxerr.lib dxgi.lib dxguid.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\MeshView.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\MeshView.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\MeshView.lib" /MACHINE:X86 Release\Camera.obj
+         Release\d3dApp.obj
+         Release\d3dUtil.obj
+         Release\GameTimer.obj
+         Release\GeometryGenerator.obj
+         Release\LightHelper.obj
+         Release\MathHelper.obj
+         Release\TextureMgr.obj
+         Release\Waves.obj
+         Release\xnacollision.obj
+         Release\BasicModel.obj
+         Release\Effects.obj
+         Release\LoadM3d.obj
+         Release\MeshGeometry.obj
+         Release\MeshViewDemo.obj
+         Release\RenderStates.obj
+         Release\ShadowMap.obj
+         Release\Sky.obj
+         Release\Ssao.obj
+         Release\Vertex.obj
+            正在创建库 F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\MeshView.lib 和对象 F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\MeshView.exp
+         正在生成代码
+         已完成代码的生成
+     1>Effects11.lib(EffectAPI.obj) : warning LNK4204: “F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\vc100.pdb”缺少引用模块的调试信息；正在链接对象，如同没有调试信息一样
+     1>Effects11.lib(EffectNonRuntime.obj) : warning LNK4204: “F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\vc100.pdb”缺少引用模块的调试信息；正在链接对象，如同没有调试信息一样
+     1>Effects11.lib(EffectLoad.obj) : warning LNK4204: “F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\vc100.pdb”缺少引用模块的调试信息；正在链接对象，如同没有调试信息一样
+     1>Effects11.lib(d3dxGlobal.obj) : warning LNK4204: “F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\vc100.pdb”缺少引用模块的调试信息；正在链接对象，如同没有调试信息一样
+     1>Effects11.lib(EffectReflection.obj) : warning LNK4204: “F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\vc100.pdb”缺少引用模块的调试信息；正在链接对象，如同没有调试信息一样
+     1>Effects11.lib(EffectRuntime.obj) : warning LNK4204: “F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\vc100.pdb”缺少引用模块的调试信息；正在链接对象，如同没有调试信息一样
+         MeshView.vcxproj -> F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\MeshView.exe
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\Release\MeshView.exe;#1" /manifest Release\MeshView.exe.intermediate.manifest
+       FinalizeBuildStatus:
+         正在删除文件“Release\MeshView.unsuccessfulbuild”。
+         正在对“Release\MeshView.lastbuildstate”执行 Touch 任务。
+     1>已完成生成项目“F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\MeshView.vcxproj”(build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:07.82
