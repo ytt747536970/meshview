@@ -355,167 +355,23 @@ void MeshViewApp::DrawScene()
 	//
 	// Render the scene to the shadow map.
 	//
-
 	mSmap->BindDsvAndSetNullRenderTarget(md3dImmediateContext);
-
-	DrawSceneToShadowMap();
-
 	md3dImmediateContext->RSSetState(0);
-
 	//
 	// Render the view space normals and depths.  This render target has the
 	// same dimensions as the back buffer, so we can use the screen viewport.
 	// This render pass is needed to compute the ambient occlusion.
 	// Notice that we use the main depth/stencil buffer in this pass.  
 	//
-
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 	md3dImmediateContext->RSSetViewports(1, &mScreenViewport);
-	mSsao->SetNormalDepthRenderTarget(mDepthStencilView);
-	
-	DrawSceneToSsaoNormalDepthMap();
-
-	//
-	// Now compute the ambient occlusion.
-	//
-
-	mSsao->ComputeSsao(mCam);
-	mSsao->BlurAmbientMap(2);
-
-	//
 	// Restore the back and depth buffer and viewport to the OM stage.
-	//
 	ID3D11RenderTargetView* renderTargets[1] = {mRenderTargetView};
 	md3dImmediateContext->OMSetRenderTargets(1, renderTargets, mDepthStencilView);
-	md3dImmediateContext->RSSetViewports(1, &mScreenViewport);
-
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
-
-	// We already laid down scene depth to the depth buffer in the Normal/Depth map pass,
-	// so we can set the depth comparison test to “EQUALS.”  This prevents any overdraw
-	// in this rendering pass, as only the nearest visible pixels will pass this depth
-	// comparison test.
-
-	md3dImmediateContext->OMSetDepthStencilState(RenderStates::EqualsDSS, 0);
- 
-	XMMATRIX view     = mCam.View();
-	XMMATRIX proj     = mCam.Proj();
-	XMMATRIX viewProj = mCam.ViewProj();
-
-	float blendFactor[] = {0.0f, 0.0f, 0.0f, 0.0f};
-
-	// Set per frame constants.
-	Effects::NormalMapFX->SetDirLights(mDirLights);
-	Effects::NormalMapFX->SetEyePosW(mCam.GetPosition());
-	Effects::NormalMapFX->SetCubeMap(mSky->CubeMapSRV());
-	Effects::NormalMapFX->SetShadowMap(mSmap->DepthMapSRV());
-	Effects::NormalMapFX->SetSsaoMap(mSsao->AmbientSRV());
-
-	ID3DX11EffectTechnique* tech = Effects::NormalMapFX->Light3TexTech;
-	ID3DX11EffectTechnique* alphaClippedTech = Effects::NormalMapFX->Light3TexAlphaClipTech;
-
-	md3dImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-
-	XMMATRIX world;
-	XMMATRIX worldInvTranspose;
-	XMMATRIX worldViewProj;
-
-	// Transform NDC space [-1,+1]^2 to texture space [0,1]^2
-	XMMATRIX toTexSpace(
-		0.5f, 0.0f, 0.0f, 0.0f,
-		0.0f, -0.5f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.5f, 0.5f, 0.0f, 1.0f);
-
-	XMMATRIX shadowTransform = XMLoadFloat4x4(&mShadowTransform);
-
-	
-	UINT stride = sizeof(Vertex::PosNormalTexTan);
-    UINT offset = 0;
-
-	md3dImmediateContext->IASetInputLayout(InputLayouts::PosNormalTexTan);
-     
-	if( GetAsyncKeyState('1') & 0x8000 )
-		md3dImmediateContext->RSSetState(RenderStates::WireframeRS);
-	
-	//
-	// Draw opaque objects.
-	//
-    D3DX11_TECHNIQUE_DESC techDesc;
-    tech->GetDesc( &techDesc );
-    for(UINT p = 0; p < techDesc.Passes; ++p)
-    {
-		for(UINT modelIndex = 0; modelIndex < mModelInstances.size(); ++modelIndex)
-		{
-			world = XMLoadFloat4x4(&mModelInstances[modelIndex].World);
-			worldInvTranspose = MathHelper::InverseTranspose(world);
-			worldViewProj = world*view*proj;
-
-			Effects::NormalMapFX->SetWorld(world);
-			Effects::NormalMapFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::NormalMapFX->SetWorldViewProj(worldViewProj);
-			Effects::NormalMapFX->SetWorldViewProjTex(worldViewProj*toTexSpace);
-			Effects::NormalMapFX->SetShadowTransform(world*shadowTransform);
-			Effects::NormalMapFX->SetTexTransform(XMMatrixScaling(1.0f, 1.0f, 1.0f));
-
-			for(UINT subset = 0; subset < mModelInstances[modelIndex].Model->SubsetCount; ++subset)
-			{
-				Effects::NormalMapFX->SetMaterial(mModelInstances[modelIndex].Model->Mat[subset]);
-				Effects::NormalMapFX->SetDiffuseMap(mModelInstances[modelIndex].Model->DiffuseMapSRV[subset]);
-				Effects::NormalMapFX->SetNormalMap(mModelInstances[modelIndex].Model->NormalMapSRV[subset]);
-
-				tech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-				mModelInstances[modelIndex].Model->ModelMesh.Draw(md3dImmediateContext, subset);
-			}
-		}
-    }
-
-	// The alpha tested triangles are leaves, so render them double sided.
-	md3dImmediateContext->RSSetState(RenderStates::NoCullRS);
-	alphaClippedTech->GetDesc( &techDesc );
-    for(UINT p = 0; p < techDesc.Passes; ++p)
-    {
-		for(UINT modelIndex = 0; modelIndex < mAlphaClippedModelInstances.size(); ++modelIndex)
-		{
-			world = XMLoadFloat4x4(&mAlphaClippedModelInstances[modelIndex].World);
-			worldInvTranspose = MathHelper::InverseTranspose(world);
-			worldViewProj = world*view*proj;
-
-			Effects::NormalMapFX->SetWorld(world);
-			Effects::NormalMapFX->SetWorldInvTranspose(worldInvTranspose);
-			Effects::NormalMapFX->SetWorldViewProj(worldViewProj);
-			Effects::NormalMapFX->SetWorldViewProjTex(worldViewProj*toTexSpace);
-			Effects::NormalMapFX->SetShadowTransform(world*shadowTransform);
-			Effects::NormalMapFX->SetTexTransform(XMMatrixScaling(1.0f, 1.0f, 1.0f));
-
-			for(UINT subset = 0; subset < mAlphaClippedModelInstances[modelIndex].Model->SubsetCount; ++subset)
-			{
-				Effects::NormalMapFX->SetMaterial(mAlphaClippedModelInstances[modelIndex].Model->Mat[subset]);
-				Effects::NormalMapFX->SetDiffuseMap(mAlphaClippedModelInstances[modelIndex].Model->DiffuseMapSRV[subset]);
-				Effects::NormalMapFX->SetNormalMap(mAlphaClippedModelInstances[modelIndex].Model->NormalMapSRV[subset]);
-
-				alphaClippedTech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
-				mAlphaClippedModelInstances[modelIndex].Model->ModelMesh.Draw(md3dImmediateContext, subset);
-			}
-		}
-    }
-
-	// Turn off wireframe.
-	md3dImmediateContext->RSSetState(0);
-
-	// Restore from RenderStates::EqualsDSS
-	md3dImmediateContext->OMSetDepthStencilState(0, 0);
-
-	// Debug view SSAO map.
-	//DrawScreenQuad(mSsao->AmbientSRV());
-
 	mSky->Draw(md3dImmediateContext, mCam);
-
 	// restore default states, as the SkyFX changes them in the effect file.
 	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
-
 	// Unbind shadow map and AmbientMap as a shader input because we are going to render
 	// to it next frame.  These textures can be at any slot, so clear all slots.
 	ID3D11ShaderResourceView* nullSRV[16] = { 0 };

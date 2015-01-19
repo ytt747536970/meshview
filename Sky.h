@@ -20,7 +20,7 @@ public:
 	ID3D11ShaderResourceView* CubeMapSRV();
 
 	void Draw(ID3D11DeviceContext* dc, const Camera& camera);
-
+	HRESULT loadLUTS(char* fileName, LPCSTR shaderTextureName, int xRes, int yRes, ID3D11Device* pd3dDevice);
 private:
 	Sky(const Sky& rhs);
 	Sky& operator=(const Sky& rhs);

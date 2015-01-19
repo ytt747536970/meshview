@@ -363,13 +363,25 @@ public:
 	~SkyEffect();
 
 	void SetWorldViewProj(CXMMATRIX M)                  { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
+	void SetInvView(CXMMATRIX invview)                  { InvView->SetMatrix(reinterpret_cast<const float*>(&invview)); }
+	void SetInvProj(CXMMATRIX inverseProjection)        { InverseProjection->SetMatrix(reinterpret_cast<const float*>(&inverseProjection)); }
+	void SetWorld(CXMMATRIX world)                      { World->SetMatrix(reinterpret_cast<const float*>(&world)); }
+	void SetEye(XMFLOAT3 eyePosW)                       { EyePosW->SetFloatVector(reinterpret_cast<const float*>(&eyePosW)); }
 	void SetCubeMap(ID3D11ShaderResourceView* cubemap)  { CubeMap->SetResource(cubemap); }
+	void SetFtable(ID3D11ShaderResourceView* ftable)    { Ftable->SetResource(ftable); }
+
+	
 
 	ID3DX11EffectTechnique* SkyTech;
 
 	ID3DX11EffectMatrixVariable* WorldViewProj;
+	ID3DX11EffectMatrixVariable* InvView;
+	ID3DX11EffectMatrixVariable* InverseProjection;
+	ID3DX11EffectMatrixVariable* World;
+	ID3DX11EffectVectorVariable* EyePosW;
 
 	ID3DX11EffectShaderResourceVariable* CubeMap;
+	ID3DX11EffectShaderResourceVariable* Ftable;
 };
 #pragma endregion
 
