@@ -24,7 +24,7 @@
 #include "Ssao.h"
 #include "TextureMgr.h"
 #include "BasicModel.h"
-
+#include "ocean_simulator.h"
 struct BoundingSphere
 {
 	BoundingSphere() : Center(0.0f, 0.0f, 0.0f), Radius(0.0f) {}
@@ -41,7 +41,7 @@ public:
 	bool Init();
 	void OnResize();
 	void UpdateScene(float dt);
-	void DrawScene(); 
+	void DrawScene(float dt); 
 
 	void OnMouseDown(WPARAM btnState, int x, int y);
 	void OnMouseUp(WPARAM btnState, int x, int y);
@@ -59,7 +59,7 @@ private:
 	TextureMgr mTexMgr;
 
 	Sky* mSky;
-
+	OceanSimulator* g_pOceanSimulator;
 	BasicModel* mTreeModel;
 	BasicModel* mBaseModel;
 	BasicModel* mStairsModel;
@@ -96,7 +96,10 @@ private:
 
 	POINT mLastMousePos;
 };
-
+void renderShaded(const Camera& camera, ID3D11ShaderResourceView* displacemnet_map, ID3D11ShaderResourceView* gradient_map, float time, ID3D11DeviceContext* pd3dContext,ID3D11RenderTargetView* m_pCurrStepMapRTV);
+void renderWireframe(const Camera& camera, ID3D11ShaderResourceView* displacemnet_map, float time, ID3D11DeviceContext* pd3dContext);
+void cleanupRenderResource();
+void initRenderResource(const OceanParameter& ocean_param, ID3D11Device* pd3dDevice);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 				   PSTR cmdLine, int showCmd)
 {
@@ -162,6 +165,7 @@ MeshViewApp::~MeshViewApp()
 	SafeDelete(mSky);
 	SafeDelete(mSmap);
 	SafeDelete(mSsao);
+	SafeDelete(g_pOceanSimulator);
 
 	ReleaseCOM(mScreenQuadVB);
 	ReleaseCOM(mScreenQuadIB);
@@ -169,6 +173,7 @@ MeshViewApp::~MeshViewApp()
 	Effects::DestroyAll();
 	InputLayouts::DestroyAll(); 
 	RenderStates::DestroyAll();
+	cleanupRenderResource();
 }
 
 bool MeshViewApp::Init()
@@ -183,10 +188,38 @@ bool MeshViewApp::Init()
 
 	mTexMgr.Init(md3dDevice);
 
+	OceanParameter ocean_param;
+
+	// The size of displacement map. In this sample, it's fixed to 512.
+	//ocean_param.dmap_dim			= 512;
+	ocean_param.dmap_dim			= 512;
+	// The side length (world space) of square patch
+	ocean_param.patch_length		= 2000.0f;
+	// Adjust this parameter to control the simulation speed
+	ocean_param.time_scale			= 0.8f;
+	// A scale to control the amplitude. Not the world space height
+	ocean_param.wave_amplitude		= 0.35f;
+	// 2D wind direction. No need to be normalized
+	ocean_param.wind_dir			= XMFLOAT2(0.8f, 0.6f);
+	// The bigger the wind speed, the larger scale of wave crest.
+	// But the wave scale can be no larger than patch_length
+	ocean_param.wind_speed			= 600.0f;
+	// Damp out the components opposite to wind direction.
+	// The smaller the value, the higher wind dependency
+	ocean_param.wind_dependency		= 0.07f;
+	// Control the scale of horizontal movement. Higher value creates
+	// pointy crests.
+	ocean_param.choppy_scale		= 1.3f;
+
+	initRenderResource(ocean_param, md3dDevice);
+	g_pOceanSimulator = new OceanSimulator(ocean_param, md3dDevice);
+	g_pOceanSimulator->updateDisplacementMap(0);
+
 	mSky  = new Sky(md3dDevice, L"Textures/desertcube1024.dds", 5000.0f);
 	mSmap = new ShadowMap(md3dDevice, SMapSize, SMapSize);
 
-	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+	//mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 100.0f, 200000.0f);
 	mSsao = new Ssao(md3dDevice, md3dImmediateContext, mClientWidth, mClientHeight, mCam.GetFovY(), mCam.GetFarZ());
 
 	BuildScreenQuadGeometryBuffers();
@@ -316,7 +349,7 @@ void MeshViewApp::OnResize()
 {
 	D3DApp::OnResize();
 
-	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 100.0f, 200000.0f);
 
 	if( mSsao )
 	{
@@ -330,32 +363,34 @@ void MeshViewApp::UpdateScene(float dt)
 	// Control the camera.
 	//
 	if( GetAsyncKeyState('W') & 0x8000 )
-		mCam.Walk(10.0f*dt);
+		mCam.Walk(100.0f*dt);
 
 	if( GetAsyncKeyState('S') & 0x8000 )
-		mCam.Walk(-10.0f*dt);
+		mCam.Walk(-100.0f*dt);
 
 	if( GetAsyncKeyState('A') & 0x8000 )
-		mCam.Strafe(-10.0f*dt);
+		mCam.Strafe(-100.0f*dt);
 
 	if( GetAsyncKeyState('D') & 0x8000 )
-		mCam.Strafe(10.0f*dt);
+		mCam.Strafe(100.0f*dt);
 
 	//
 	// Animate the lights (and hence shadows).
 	//
+	
 
 	BuildShadowTransform();
 
 	mCam.UpdateViewMatrix();
+	g_pOceanSimulator->updateDisplacementMap(dt);
 }
 
-void MeshViewApp::DrawScene()
+void MeshViewApp::DrawScene(float dt)
 {
 	//
 	// Render the scene to the shadow map.
 	//
-	mSmap->BindDsvAndSetNullRenderTarget(md3dImmediateContext);
+/*	mSmap->BindDsvAndSetNullRenderTarget(md3dImmediateContext);
 	md3dImmediateContext->RSSetState(0);
 	//
 	// Render the view space normals and depths.  This render target has the
@@ -367,15 +402,26 @@ void MeshViewApp::DrawScene()
 	md3dImmediateContext->RSSetViewports(1, &mScreenViewport);
 	// Restore the back and depth buffer and viewport to the OM stage.
 	ID3D11RenderTargetView* renderTargets[1] = {mRenderTargetView};
-	md3dImmediateContext->OMSetRenderTargets(1, renderTargets, mDepthStencilView);
-	mSky->Draw(md3dImmediateContext, mCam);
+	md3dImmediateContext->OMSetRenderTargets(1, renderTargets, mDepthStencilView);*/
+
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
+	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+	ID3D11ShaderResourceView* tex_displacement = g_pOceanSimulator->getD3D11DisplacementMap();
+	ID3D11ShaderResourceView* tex_gradient = g_pOceanSimulator->getD3D11GradientMap();
+	ID3D11ShaderResourceView* m_pCurrStepMapSRV = g_pOceanSimulator->getD3D11CurrStepMap();//改动
+	ID3D11RenderTargetView* m_pCurrStepMapRTV = g_pOceanSimulator->getD3D11CurrStepMapRTV();//改动
+	renderWireframe(mCam, tex_displacement, dt, md3dImmediateContext);
+	//renderShaded(mCam, tex_displacement, tex_gradient, dt, md3dImmediateContext,m_pCurrStepMapRTV);
+
+//	mSky->Draw(md3dImmediateContext, mCam);
 	// restore default states, as the SkyFX changes them in the effect file.
-	md3dImmediateContext->RSSetState(0);
+/*	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
 	// Unbind shadow map and AmbientMap as a shader input because we are going to render
 	// to it next frame.  These textures can be at any slot, so clear all slots.
 	ID3D11ShaderResourceView* nullSRV[16] = { 0 };
-	md3dImmediateContext->PSSetShaderResources(0, 16, nullSRV);
+	md3dImmediateContext->PSSetShaderResources(0, 16, nullSRV);*/
 
 	HR(mSwapChain->Present(0, 0));
 }

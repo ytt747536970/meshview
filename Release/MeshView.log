@@ -1,4 +1,4 @@
-﻿生成启动时间为 2015/1/19 20:14:44。
+﻿生成启动时间为 2015/1/24 21:42:18。
      1>项目“F:\virtual reality\samples code\Directx series\Directx11\d3d11CodeSet3\Chapter 23 Meshes\MeshView\MeshView.vcxproj”在节点 2 上(build 个目标)。
      1>InitializeBuildStatus:
          正在创建“Release\MeshView.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
@@ -20,10 +20,14 @@
          Release\xnacollision.obj
          Release\BasicModel.obj
          Release\Effects.obj
+         Release\fft_512x512_c2c.obj
          Release\LoadM3d.obj
          Release\MeshGeometry.obj
          Release\MeshViewDemo.obj
+         Release\ocean_simulator.obj
+         Release\render.obj
          Release\RenderStates.obj
+         Release\SDKmisc.obj
          Release\ShadowMap.obj
          Release\Sky.obj
          Release\Ssao.obj
@@ -47,4 +51,4 @@
 
 生成成功。
 
-已用时间 00:00:08.41
+已用时间 00:00:14.77

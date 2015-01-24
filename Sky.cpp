@@ -69,6 +69,7 @@ Sky::Sky(ID3D11Device* device, const std::wstring& cubemapFilename, float skySph
 
 Sky::~Sky()
 {
+	
 	ReleaseCOM(mVB);
 	ReleaseCOM(mIB);
 	ReleaseCOM(mCubeMapSRV);
