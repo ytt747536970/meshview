@@ -12,7 +12,7 @@
 
 #include "d3dApp.h"
 #include "d3dx11Effect.h"
-#include "GeometryGenerator.h"
+//#include "GeometryGenerator.h"
 #include "MathHelper.h"
 #include "LightHelper.h"
 #include "Effects.h"
@@ -21,10 +21,11 @@
 #include "Sky.h"
 #include "RenderStates.h"
 #include "ShadowMap.h"
-#include "Ssao.h"
+//#include "Ssao.h"
 #include "TextureMgr.h"
-#include "BasicModel.h"
+//#include "BasicModel.h"
 #include "ocean_simulator.h"
+#include "drawshadowmap.h"
 struct BoundingSphere
 {
 	BoundingSphere() : Center(0.0f, 0.0f, 0.0f), Radius(0.0f) {}
@@ -59,26 +60,27 @@ private:
 	TextureMgr mTexMgr;
 
 	Sky* mSky;
-	OceanSimulator* g_pOceanSimulator;
-	BasicModel* mTreeModel;
+	
+/*	BasicModel* mTreeModel;
 	BasicModel* mBaseModel;
 	BasicModel* mStairsModel;
 	BasicModel* mPillar1Model;
 	BasicModel* mPillar2Model;
 	BasicModel* mPillar3Model;
 	BasicModel* mPillar4Model;
-	BasicModel* mRockModel;
+	BasicModel* mRockModel;*/
+	DrawShadowMap shadowmap;
+	OceanSimulator* g_pOceanSimulator;
+//	std::vector<BasicModelInstance> mModelInstances;
+//	std::vector<BasicModelInstance> mAlphaClippedModelInstances;
 
-	std::vector<BasicModelInstance> mModelInstances;
-	std::vector<BasicModelInstance> mAlphaClippedModelInstances;
-
-	ID3D11Buffer* mSkySphereVB;
+/*	ID3D11Buffer* mSkySphereVB;
 	ID3D11Buffer* mSkySphereIB;
 
 	ID3D11Buffer* mScreenQuadVB;
 	ID3D11Buffer* mScreenQuadIB;
 
-	BoundingSphere mSceneBounds;
+	BoundingSphere mSceneBounds;*/
 
 	static const int SMapSize = 2048;
 	ShadowMap* mSmap;
@@ -86,7 +88,7 @@ private:
 	XMFLOAT4X4 mLightProj;
 	XMFLOAT4X4 mShadowTransform;
 
-	Ssao* mSsao;
+//	Ssao* mSsao;
 
 	float mLightRotationAngle;
 	XMFLOAT3 mOriginalLightDir[3];
@@ -118,11 +120,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
  
 
 MeshViewApp::MeshViewApp(HINSTANCE hInstance)
-: D3DApp(hInstance), mSky(0), mTreeModel(0), mBaseModel(0), mStairsModel(0), 
+: D3DApp(hInstance), mSky(0)/*, mTreeModel(0), mBaseModel(0), mStairsModel(0), 
   mPillar1Model(0), mPillar2Model(0), mPillar3Model(0), mPillar4Model(0), mRockModel(0),
   mScreenQuadVB(0), mScreenQuadIB(0),
   mSmap(0), mSsao(0),
-  mLightRotationAngle(0.0f)
+  mLightRotationAngle(0.0f)*/
 {
 	mMainWndCaption = L"MeshView Demo";
 	
@@ -153,22 +155,22 @@ MeshViewApp::MeshViewApp(HINSTANCE hInstance)
 
 MeshViewApp::~MeshViewApp()
 {
-	SafeDelete(mTreeModel);
+	/*SafeDelete(mTreeModel);
 	SafeDelete(mBaseModel);
 	SafeDelete(mStairsModel);
 	SafeDelete(mPillar1Model);
 	SafeDelete(mPillar2Model);
 	SafeDelete(mPillar3Model);
 	SafeDelete(mPillar4Model);
-	SafeDelete(mRockModel);
+	SafeDelete(mRockModel);*/
 
 	SafeDelete(mSky);
-	SafeDelete(mSmap);
-	SafeDelete(mSsao);
-	SafeDelete(g_pOceanSimulator);
+//	SafeDelete(mSmap);
+//	SafeDelete(mSsao);
+//	SafeDelete(g_pOceanSimulator);
 
-	ReleaseCOM(mScreenQuadVB);
-	ReleaseCOM(mScreenQuadIB);
+//	ReleaseCOM(mScreenQuadVB);
+//	ReleaseCOM(mScreenQuadIB);
 
 	Effects::DestroyAll();
 	InputLayouts::DestroyAll(); 
@@ -187,6 +189,7 @@ bool MeshViewApp::Init()
 	RenderStates::InitAll(md3dDevice);
 
 	mTexMgr.Init(md3dDevice);
+	shadowmap.init(md3dDevice);
 
 	OceanParameter ocean_param;
 
@@ -216,15 +219,15 @@ bool MeshViewApp::Init()
 	g_pOceanSimulator->updateDisplacementMap(0);
 
 	mSky  = new Sky(md3dDevice, L"Textures/desertcube1024.dds", 5000.0f);
-	mSmap = new ShadowMap(md3dDevice, SMapSize, SMapSize);
+//	mSmap = new ShadowMap(md3dDevice, SMapSize, SMapSize);
 
-	//mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
-	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 100.0f, 200000.0f);
-	mSsao = new Ssao(md3dDevice, md3dImmediateContext, mClientWidth, mClientHeight, mCam.GetFovY(), mCam.GetFarZ());
+	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
+	//mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 100.0f, 200000.0f);
+//	mSsao = new Ssao(md3dDevice, md3dImmediateContext, mClientWidth, mClientHeight, mCam.GetFovY(), mCam.GetFarZ());
 
-	BuildScreenQuadGeometryBuffers();
+//	BuildScreenQuadGeometryBuffers();
 
-	mTreeModel = new BasicModel(md3dDevice, mTexMgr, "Models\\tree.m3d", L"Textures\\");
+/*	mTreeModel = new BasicModel(md3dDevice, mTexMgr, "Models\\tree.m3d", L"Textures\\");
 	mBaseModel = new BasicModel(md3dDevice, mTexMgr, "Models\\base.m3d", L"Textures\\");
 	mStairsModel = new BasicModel(md3dDevice, mTexMgr, "Models\\stairs.m3d", L"Textures\\");
 	mPillar1Model = new BasicModel(md3dDevice, mTexMgr, "Models\\pillar1.m3d", L"Textures\\");
@@ -304,12 +307,12 @@ bool MeshViewApp::Init()
 	mModelInstances.push_back(rockInstance1);
 	mModelInstances.push_back(rockInstance2);
 	mModelInstances.push_back(rockInstance3);
-
+	*/
 	//
 	// Compute scene bounding box.
 	//
 
-	XMFLOAT3 minPt(+MathHelper::Infinity, +MathHelper::Infinity, +MathHelper::Infinity);
+/*	XMFLOAT3 minPt(+MathHelper::Infinity, +MathHelper::Infinity, +MathHelper::Infinity);
 	XMFLOAT3 maxPt(-MathHelper::Infinity, -MathHelper::Infinity, -MathHelper::Infinity);
 	for(UINT i = 0; i < mModelInstances.size(); ++i)
 	{
@@ -326,11 +329,11 @@ bool MeshViewApp::Init()
 			maxPt.z = MathHelper::Max(maxPt.x, P.x);
 		}
 	}
-
+	*/
 	//
 	// Derive scene bounding sphere from bounding box.
 	//
-	mSceneBounds.Center = XMFLOAT3(
+/*	mSceneBounds.Center = XMFLOAT3(
 		0.5f*(minPt.x + maxPt.x),
 		0.5f*(minPt.y + maxPt.y),
 		0.5f*(minPt.z + maxPt.z));
@@ -340,7 +343,7 @@ bool MeshViewApp::Init()
 		0.5f*(maxPt.y - minPt.y),
 		0.5f*(maxPt.z - minPt.z));
 
-	mSceneBounds.Radius = sqrtf(extent.x*extent.x + extent.y*extent.y + extent.z*extent.z);
+	mSceneBounds.Radius = sqrtf(extent.x*extent.x + extent.y*extent.y + extent.z*extent.z);*/
 
 	return true;
 }
@@ -349,12 +352,12 @@ void MeshViewApp::OnResize()
 {
 	D3DApp::OnResize();
 
-	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 100.0f, 200000.0f);
+	mCam.SetLens(0.25f*MathHelper::Pi, AspectRatio(), 1.0f, 1000.0f);
 
-	if( mSsao )
+/*	if( mSsao )
 	{
 		mSsao->OnSize(mClientWidth, mClientHeight, mCam.GetFovY(), mCam.GetFarZ());
-	}
+	}*/
 }
 
 void MeshViewApp::UpdateScene(float dt)
@@ -379,7 +382,7 @@ void MeshViewApp::UpdateScene(float dt)
 	//
 	
 
-	BuildShadowTransform();
+	//BuildShadowTransform();
 
 	mCam.UpdateViewMatrix();
 	g_pOceanSimulator->updateDisplacementMap(dt);
@@ -404,17 +407,21 @@ void MeshViewApp::DrawScene(float dt)
 	ID3D11RenderTargetView* renderTargets[1] = {mRenderTargetView};
 	md3dImmediateContext->OMSetRenderTargets(1, renderTargets, mDepthStencilView);*/
 
-	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::Silver));
+	md3dImmediateContext->ClearRenderTargetView(mRenderTargetView, reinterpret_cast<const float*>(&Colors::White));
 	md3dImmediateContext->ClearDepthStencilView(mDepthStencilView, D3D11_CLEAR_DEPTH|D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	ID3D11ShaderResourceView* tex_displacement = g_pOceanSimulator->getD3D11DisplacementMap();
 	ID3D11ShaderResourceView* tex_gradient = g_pOceanSimulator->getD3D11GradientMap();
 	ID3D11ShaderResourceView* m_pCurrStepMapSRV = g_pOceanSimulator->getD3D11CurrStepMap();//改动
 	ID3D11RenderTargetView* m_pCurrStepMapRTV = g_pOceanSimulator->getD3D11CurrStepMapRTV();//改动
-	renderWireframe(mCam, tex_displacement, dt, md3dImmediateContext);
-	//renderShaded(mCam, tex_displacement, tex_gradient, dt, md3dImmediateContext,m_pCurrStepMapRTV);
-
+	//renderWireframe(mCam, tex_displacement, dt, md3dImmediateContext);
+	
+	
+//	shadowmap.showmap(tex_gradient,mCam);
+//	shadowmap.showmap(mCam);
+	
 //	mSky->Draw(md3dImmediateContext, mCam);
+	renderShaded(mCam, tex_displacement, tex_gradient, dt, md3dImmediateContext,m_pCurrStepMapRTV);
 	// restore default states, as the SkyFX changes them in the effect file.
 /*	md3dImmediateContext->RSSetState(0);
 	md3dImmediateContext->OMSetDepthStencilState(0, 0);
@@ -422,7 +429,7 @@ void MeshViewApp::DrawScene(float dt)
 	// to it next frame.  These textures can be at any slot, so clear all slots.
 	ID3D11ShaderResourceView* nullSRV[16] = { 0 };
 	md3dImmediateContext->PSSetShaderResources(0, 16, nullSRV);*/
-
+//	md3dImmediateContext->RSSetState(0);
 	HR(mSwapChain->Present(0, 0));
 }
 
@@ -479,7 +486,7 @@ void MeshViewApp::DrawSceneToSsaoNormalDepthMap()
      
     D3DX11_TECHNIQUE_DESC techDesc;
     tech->GetDesc( &techDesc );
-    for(UINT p = 0; p < techDesc.Passes; ++p)
+ /*   for(UINT p = 0; p < techDesc.Passes; ++p)
     {
 		for(UINT modelIndex = 0; modelIndex < mModelInstances.size(); ++modelIndex)
 		{
@@ -501,11 +508,11 @@ void MeshViewApp::DrawSceneToSsaoNormalDepthMap()
 			}
 		}
     }
-
+	*/
 	// The alpha tested triangles are leaves, so render them double sided.
 	md3dImmediateContext->RSSetState(RenderStates::NoCullRS);
 	alphaClippedTech->GetDesc( &techDesc );
-    for(UINT p = 0; p < techDesc.Passes; ++p)
+  /*  for(UINT p = 0; p < techDesc.Passes; ++p)
     {
 		for(UINT modelIndex = 0; modelIndex < mAlphaClippedModelInstances.size(); ++modelIndex)
 		{
@@ -527,14 +534,14 @@ void MeshViewApp::DrawSceneToSsaoNormalDepthMap()
 				mAlphaClippedModelInstances[modelIndex].Model->ModelMesh.Draw(md3dImmediateContext, subset);
 			}
 		}
-    }
+    }*/
  
 	md3dImmediateContext->RSSetState(0);
 }
 
 void MeshViewApp::DrawSceneToShadowMap()
 {
-	XMMATRIX view     = XMLoadFloat4x4(&mLightView);
+/*	XMMATRIX view     = XMLoadFloat4x4(&mLightView);
 	XMMATRIX proj     = XMLoadFloat4x4(&mLightProj);
 	XMMATRIX viewProj = XMMatrixMultiply(view, proj);
 
@@ -602,12 +609,12 @@ void MeshViewApp::DrawSceneToShadowMap()
 		}
     }
 
-	md3dImmediateContext->RSSetState(0);
+	md3dImmediateContext->RSSetState(0);*/
 }
 
 void MeshViewApp::DrawScreenQuad(ID3D11ShaderResourceView* srv)
 {
-	UINT stride = sizeof(Vertex::Basic32);
+/*	UINT stride = sizeof(Vertex::Basic32);
     UINT offset = 0;
 
 	md3dImmediateContext->IASetInputLayout(InputLayouts::Basic32);
@@ -633,13 +640,13 @@ void MeshViewApp::DrawScreenQuad(ID3D11ShaderResourceView* srv)
 
 		tech->GetPassByIndex(p)->Apply(0, md3dImmediateContext);
 		md3dImmediateContext->DrawIndexed(6, 0, 0);
-    }
+    }*/
 }
 
 void MeshViewApp::BuildShadowTransform()
 {
 	// Only the first "main" light casts a shadow.
-	XMVECTOR lightDir = XMLoadFloat3(&mDirLights[0].Direction);
+/*	XMVECTOR lightDir = XMLoadFloat3(&mDirLights[0].Direction);
 	XMVECTOR lightPos = -2.0f*mSceneBounds.Radius*lightDir;
 	XMVECTOR targetPos = XMLoadFloat3(&mSceneBounds.Center);
 	XMVECTOR up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -670,12 +677,12 @@ void MeshViewApp::BuildShadowTransform()
 
 	XMStoreFloat4x4(&mLightView, V);
 	XMStoreFloat4x4(&mLightProj, P);
-	XMStoreFloat4x4(&mShadowTransform, S);
+	XMStoreFloat4x4(&mShadowTransform, S);*/
 }
 
 void MeshViewApp::BuildScreenQuadGeometryBuffers()
 {
-	GeometryGenerator::MeshData quad;
+/*	GeometryGenerator::MeshData quad;
 
 	GeometryGenerator geoGen;
 	geoGen.CreateFullscreenQuad(quad);
@@ -716,5 +723,5 @@ void MeshViewApp::BuildScreenQuadGeometryBuffers()
     ibd.MiscFlags = 0;
     D3D11_SUBRESOURCE_DATA iinitData;
     iinitData.pSysMem = &quad.Indices[0];
-    HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mScreenQuadIB));
+    HR(md3dDevice->CreateBuffer(&ibd, &iinitData, &mScreenQuadIB));*/
 }

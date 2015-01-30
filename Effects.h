@@ -406,6 +406,30 @@ public:
 };
 #pragma endregion
 
+#pragma region DrawShadowMapEffect
+class DrawShadowMapEffect : public Effect
+{
+public:
+	DrawShadowMapEffect(ID3D11Device* device, const std::wstring& filename);
+	~DrawShadowMapEffect();
+
+	/*void SetWorldViewProj(CXMMATRIX M)              { WorldViewProj->SetMatrix(reinterpret_cast<const float*>(&M)); }
+	void SetTexture(ID3D11ShaderResourceView* tex)  { Texture->SetResource(tex); }
+
+	ID3DX11EffectTechnique* ViewArgbTech;
+	ID3DX11EffectTechnique* ViewRedTech;
+	ID3DX11EffectTechnique* ViewGreenTech;
+	ID3DX11EffectTechnique* ViewBlueTech;
+	ID3DX11EffectTechnique* ViewAlphaTech;*/
+
+	ID3DX11EffectMatrixVariable* gWVP;
+	ID3DX11EffectTechnique* DrawShadowMapTech;
+//	ID3DX11EffectShaderResourceVariable* gShadowMap;
+//	void SetTexture(ID3D11ShaderResourceView* tex)  { gShadowMap->SetResource(tex); }
+	void SetWVP(CXMMATRIX WVP)  { gWVP->SetMatrix(reinterpret_cast<const float*>(&WVP)); }
+};
+#pragma endregion
+
 #pragma region Effects
 class Effects
 {
@@ -421,6 +445,7 @@ public:
 	static SsaoBlurEffect* SsaoBlurFX;
 	static SkyEffect* SkyFX;
 	static DebugTexEffect* DebugTexFX;
+	static DrawShadowMapEffect*DrawShadowMapFX;
 };
 #pragma endregion
 

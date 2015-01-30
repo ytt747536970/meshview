@@ -88,11 +88,9 @@
     <ClCompile Include="..\..\Common\TextureMgr.cpp" />
     <ClCompile Include="..\..\Common\Waves.cpp" />
     <ClCompile Include="..\..\Common\xnacollision.cpp" />
-    <ClCompile Include="BasicModel.cpp" />
+    <ClCompile Include="drawshadowmap.cpp" />
     <ClCompile Include="Effects.cpp" />
     <ClCompile Include="fft_512x512_c2c.cpp" />
-    <ClCompile Include="LoadM3d.cpp" />
-    <ClCompile Include="MeshGeometry.cpp" />
     <ClCompile Include="MeshViewDemo.cpp" />
     <ClCompile Include="ocean_simulator.cpp" />
     <ClCompile Include="render.cpp" />
@@ -100,7 +98,6 @@
     <ClCompile Include="SDKmisc.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="Sky.cpp" />
-    <ClCompile Include="Ssao.cpp" />
     <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -115,17 +112,14 @@
     <ClInclude Include="..\..\Common\TextureMgr.h" />
     <ClInclude Include="..\..\Common\Waves.h" />
     <ClInclude Include="..\..\Common\xnacollision.h" />
-    <ClInclude Include="BasicModel.h" />
+    <ClInclude Include="drawshadowmap.h" />
     <ClInclude Include="Effects.h" />
     <ClInclude Include="fft_512x512.h" />
-    <ClInclude Include="LoadM3d.h" />
-    <ClInclude Include="MeshGeometry.h" />
     <ClInclude Include="ocean_simulator.h" />
     <ClInclude Include="RenderStates.h" />
     <ClInclude Include="SDKmisc.h" />
     <ClInclude Include="ShadowMap.h" />
     <ClInclude Include="Sky.h" />
-    <ClInclude Include="Ssao.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
@@ -211,6 +205,12 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <CustomBuild Include="FX\drawshadowmap.fx">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">fxc /T fx_5_0 /Fo "%(RelativeDir)\%(Filename).fxo" "%(FullPath)"</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(RelativeDir)\%(Filename).fxo</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">fxc compile for release: %(FullPath)</Message>
+    </CustomBuild>
     <None Include="FX\fft_512x512_c2c.hlsl" />
     <None Include="ocean_shading.hlsl" />
   </ItemGroup>

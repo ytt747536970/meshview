@@ -326,6 +326,26 @@ DebugTexEffect::~DebugTexEffect()
 
 #pragma endregion
 
+#pragma region DrawShadowMapEffect
+DrawShadowMapEffect::DrawShadowMapEffect(ID3D11Device* device, const std::wstring& filename)
+	: Effect(device, filename)
+{
+	//SkyTech       = mFX->GetTechniqueByName("SkyTech");
+	//WorldViewProj = mFX->GetVariableByName("gWorldViewProj")->AsMatrix();
+//	gShadowMap       = mFX->GetVariableByName("gShadowMap")->AsShaderResource();
+	DrawShadowMapTech = mFX->GetTechniqueByName("DrawShadowMapTech");
+	gWVP = mFX->GetVariableByName("WVP")->AsMatrix();
+	/*Ftable       = mFX->GetVariableByName("Ftable")->AsShaderResource();
+	InvView = mFX->GetVariableByName("g_mInvView")->AsMatrix();
+	InverseProjection = mFX->GetVariableByName("g_mInverseProjection")->AsMatrix();
+	World = mFX->GetVariableByName("gWorld")->AsMatrix();
+	EyePosW = mFX->GetVariableByName("gEyePosW")->AsVector();*/
+}
+
+DrawShadowMapEffect::~DrawShadowMapEffect()
+{
+}
+#pragma endregion
 #pragma region Effects
 
 BasicEffect*           Effects::BasicFX           = 0;
@@ -336,6 +356,7 @@ SsaoEffect*            Effects::SsaoFX            = 0;
 SsaoBlurEffect*        Effects::SsaoBlurFX        = 0;
 SkyEffect*             Effects::SkyFX             = 0;
 DebugTexEffect*        Effects::DebugTexFX        = 0;
+DrawShadowMapEffect*   Effects::DrawShadowMapFX   = 0;
 
 void Effects::InitAll(ID3D11Device* device)
 {
@@ -347,6 +368,7 @@ void Effects::InitAll(ID3D11Device* device)
 	SsaoBlurFX        = new SsaoBlurEffect(device, L"FX/SsaoBlur.fxo");
 	SkyFX             = new SkyEffect(device, L"FX/Sky.fxo");
 	DebugTexFX        = new DebugTexEffect(device, L"FX/DebugTexture.fxo");
+	DrawShadowMapFX   = new DrawShadowMapEffect(device, L"FX/drawshadowmap.fxo");
 }
 
 void Effects::DestroyAll()
@@ -359,6 +381,7 @@ void Effects::DestroyAll()
 	SafeDelete(SsaoBlurFX);
 	SafeDelete(SkyFX);
 	SafeDelete(DebugTexFX);
+	SafeDelete(DrawShadowMapFX);
 }
 
 #pragma endregion

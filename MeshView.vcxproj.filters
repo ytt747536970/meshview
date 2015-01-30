@@ -51,15 +51,6 @@
     <ClCompile Include="..\..\Common\xnacollision.cpp">
       <Filter>Common</Filter>
     </ClCompile>
-    <ClCompile Include="BasicModel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LoadM3d.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshGeometry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MeshViewDemo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -70,12 +61,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShadowMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sky.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Ssao.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Vertex.cpp">
@@ -91,6 +76,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDKmisc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="drawshadowmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sky.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -125,15 +116,6 @@
     <ClInclude Include="..\..\Common\xnacollision.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="BasicModel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LoadM3d.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshGeometry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Effects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -141,12 +123,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ShadowMap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sky.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Ssao.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">
@@ -162,6 +138,12 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="SDKmisc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="drawshadowmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sky.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -191,6 +173,9 @@
       <Filter>FX</Filter>
     </CustomBuild>
     <CustomBuild Include="FX\Basic.fx">
+      <Filter>FX</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FX\drawshadowmap.fx">
       <Filter>FX</Filter>
     </CustomBuild>
   </ItemGroup>
